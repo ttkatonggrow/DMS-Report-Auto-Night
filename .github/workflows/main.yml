@@ -1,0 +1,43 @@
+name: Run Daily DMS Report
+on:
+  schedule:
+    # 06:05 เวลาไทย = 23:05 UTC (ของวันก่อนหน้า)
+    - cron: '5 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-automation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          # cache: 'npm' # ลบออกชั่วคราวเนื่องจากไม่มี package-lock.json
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Puppeteer Script
+        # ลบ continue-on-error ออก เพื่อให้แจ้งเตือนสีแดงเมื่อระบบทำงานผิดพลาด
+        env:
+          DTC_USERNAME: ${{ secrets.DTC_USERNAME }}
+          DTC_PASSWORD: ${{ secrets.DTC_PASSWORD }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: node DTCREPORTDMS18TO06_Fixed.js
+
+      - name: Upload Debug Screenshots
+        if: always() # ทำงานเสมอ ไม่ว่าจะ Success หรือ Failed เพื่อให้เราโหลดรูปไปดู Error ได้
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: ./*.png
+          if-no-files-found: warn
+          retention-days: 1
