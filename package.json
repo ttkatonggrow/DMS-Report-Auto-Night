@@ -1,0 +1,15 @@
+{
+  "name": "dms-report-auto",
+  "version": "1.0.0",
+  "description": "Automation for DTC Report 18:00-06:00",
+  "main": "DTCREPORTDMS18TO06.js",
+  "scripts": {
+    "start": "node DTCREPORTDMS18TO06.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0",
+    "nodemailer": "^6.9.7",
+    "exceljs": "^4.4.0",
+    "jsdom": "^24.0.0"
+  }
+}
